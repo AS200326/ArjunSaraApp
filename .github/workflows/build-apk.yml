@@ -13,7 +13,7 @@
 
       - name: Unzip project
         run: |
-          unzip -q ArjunSara_Android_Final_NoPhoto.zip -d project
+          unzip -q ArjunSara_MoguduPellam_Birthday_LOGO_FIXED.zip -d project
 
       - name: Setup Java
         uses: actions/setup-java@v5
