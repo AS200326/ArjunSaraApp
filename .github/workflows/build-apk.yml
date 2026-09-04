@@ -1,9 +1,9 @@
  name: Build Arjun Sara APK
 
  on:
-  workflow_dispatch:
+   workflow_dispatch:
 
-  jobs:
+ jobs:
   build:
     runs-on: ubuntu-latest
 
@@ -22,10 +22,11 @@
           java-version: '17'
       - name: Build APK
         working-directory: project/ArjunSaraApp  
-      run: gradle assembleDebug
+        run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ArjunSara-debug-apk
           path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk 
+          
