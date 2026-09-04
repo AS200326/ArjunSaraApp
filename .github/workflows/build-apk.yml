@@ -29,7 +29,7 @@
         run: gradle assembleDebug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ArjunSara-debug-apk
           path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk 
