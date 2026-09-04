@@ -22,12 +22,9 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Check ZIP contents
-        run: |
-         echo "=== PROJECT FILES ==="
-         find project -maxdepth 4 -type f | head -100
+      
 
-            - name: Build APK
+           - name: Build APK
           working-directory: project/ArjunSaraApp
               run: |
           gradle assembleDebug
