@@ -13,7 +13,8 @@ jobs:
 
       - name: Unzip project
         run: |
-          unzip -q ArjunSara_Android_v2_NoPhoto.zip -d project
+          unzip -q ArjunSara_Android_Final_NoPhoto.zip -d project
+          
 
       - name: Setup Java
         uses: actions/setup-java@v4
