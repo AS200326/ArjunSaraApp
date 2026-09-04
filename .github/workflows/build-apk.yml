@@ -29,6 +29,24 @@
         run: |
           head -n 2 project/ArjunSaraApp/app/src/main/AndroidManifest.xml | tail -n 1 | od -c
 
+      
+          - name: Clean Manifest Encoding
+           run: |
+          python3 - <<'PY'
+          path = "project/ArjunSaraApp/app/src/main/AndroidManifest.xml"
+
+          with open(path, "rb") as f:
+              content = f.read()
+
+          content = content.replace(b"\xef\xbb\xbf", b"")
+          content = content.replace(b"\xe2\x80\x9c", b'"')
+          content = content.replace(b"\xe2\x80\x9d", b'"')
+          content = content.replace(b"\xc2\xa0", b" ")
+
+          with open(path, "wb") as f:
+              f.write(content)
+
+          print("Manifest encoding cleaned")PY   
       - name: Validate Manifest
         run: |
           python3 - <<'PY'
