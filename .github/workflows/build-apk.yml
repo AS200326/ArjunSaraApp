@@ -1,9 +1,9 @@
-name: Build Arjun Sara APK
+ name: Build Arjun Sara APK
 
-on:
+ on:
   workflow_dispatch:
 
-jobs:
+  jobs:
   build:
     runs-on: ubuntu-latest
 
@@ -14,23 +14,18 @@ jobs:
       - name: Unzip project
         run: |
           unzip -q ArjunSara_Android_Final_NoPhoto.zip -d project
-          
 
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-
-      
-
-           - name: Build APK
-          working-directory: project/ArjunSaraApp
-              run: |
-          gradle assembleDebug
+      - name: Build APK
+        working-directory: project/ArjunSaraApp  
+      run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ArjunSara-debug-apk
-          path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk
+          path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk 
