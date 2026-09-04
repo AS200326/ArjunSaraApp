@@ -30,23 +30,31 @@
           head -n 2 project/ArjunSaraApp/app/src/main/AndroidManifest.xml | tail -n 1 | od -c
 
       
-          - name: Clean Manifest Encoding
-           run: |
+                - name: Clean Manifest Encoding
+        run: |
           python3 - <<'PY'
           path = "project/ArjunSaraApp/app/src/main/AndroidManifest.xml"
 
           with open(path, "rb") as f:
               content = f.read()
 
+          # Remove UTF-8 BOM
           content = content.replace(b"\xef\xbb\xbf", b"")
+
+          # Replace smart quotes
           content = content.replace(b"\xe2\x80\x9c", b'"')
           content = content.replace(b"\xe2\x80\x9d", b'"')
+
+          # Replace non-breaking space
           content = content.replace(b"\xc2\xa0", b" ")
+
+          # Fix XML ampersand in app label
+          content = content.replace(b"Arjun & Sara", b"Arjun &amp; Sara")
 
           with open(path, "wb") as f:
               f.write(content)
 
-          print("Manifest encoding cleaned")PY   
+          print("Manifest encoding cleaned successfully")PY 
       - name: Validate Manifest
         run: |
           python3 - <<'PY'
