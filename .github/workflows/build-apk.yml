@@ -26,8 +26,12 @@ jobs:
         run: find project -name gradlew -type f -print
 
       - name: Build APK
-        working-directory: project/ArjunSaraApp
-        run: ./gradlew assembleDebug
+        run: |
+         GRADLEW=$(find project -name gradlew -type f | head -n 1)
+         chmod +x "$GRADLEW"
+         DIR=$(dirname "$GRADLEW")
+         cd "$DIR"
+         ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
