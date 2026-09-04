@@ -22,8 +22,10 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Make gradlew executable
-        run: find project -name gradlew -type f -print
+      - name: Check ZIP contents
+        run: |
+         echo "=== PROJECT FILES ==="
+         find project -maxdepth 4 -type f | head -100
 
       - name: Build APK
         run: |
