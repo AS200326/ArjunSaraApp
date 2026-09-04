@@ -20,6 +20,10 @@
         with:
           distribution: temurin
           java-version: '17'
+      
+      - name: Check Manifest
+        run: |
+          cat project/ArjunSaraApp/app/src/main/AndroidManifest.xml
       - name: Build APK
         working-directory: project/ArjunSaraApp  
         run: gradle assembleDebug
