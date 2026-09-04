@@ -23,7 +23,7 @@ jobs:
           java-version: '17'
 
       - name: Make gradlew executable
-        run: chmod +x project/ArjunSaraApp/gradlew
+        run: find project -name gradlew -type f -print
 
       - name: Build APK
         working-directory: project/ArjunSaraApp
