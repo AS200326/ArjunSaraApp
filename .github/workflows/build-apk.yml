@@ -24,6 +24,13 @@
       - name: Check Manifest
         run: |
           cat project/ArjunSaraApp/app/src/main/AndroidManifest.xml
+      - name: Validate Manifest
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          ET.parse("project/ArjunSaraApp/app/src/main/AndroidManifest.xml")
+          print("Manifest XML is valid")
+          PY
       - name: Build APK
         working-directory: project/ArjunSaraApp  
         run: gradle assembleDebug
