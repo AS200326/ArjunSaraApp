@@ -27,13 +27,10 @@ jobs:
          echo "=== PROJECT FILES ==="
          find project -maxdepth 4 -type f | head -100
 
-      - name: Build APK
-        run: |
-         GRADLEW=$(find project -name gradlew -type f | head -n 1)
-         chmod +x "$GRADLEW"
-         DIR=$(dirname "$GRADLEW")
-         cd "$DIR"
-         ./gradlew assembleDebug
+            - name: Build APK
+          working-directory: project/ArjunSaraApp
+              run: |
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
