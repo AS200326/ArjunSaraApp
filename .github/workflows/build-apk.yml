@@ -30,7 +30,7 @@
           head -n 2 project/ArjunSaraApp/app/src/main/AndroidManifest.xml | tail -n 1 | od -c
 
       
-                - name: Clean Manifest Encoding
+      - name: Clean Manifest Encoding
         run: |
           python3 - <<'PY'
           path = "project/ArjunSaraApp/app/src/main/AndroidManifest.xml"
@@ -71,4 +71,5 @@
         with:
           name: ArjunSara-debug-apk
           path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk 
+
           
