@@ -24,6 +24,11 @@
       - name: Check Manifest
         run: |
           cat -A project/ArjunSaraApp/app/src/main/AndroidManifest.xml
+
+      - name: Check Manifest Detail
+        run: |
+          head -n 2 project/ArjunSaraApp/app/src/main/AndroidManifest.xml | tail -n 1 | od -c
+
       - name: Validate Manifest
         run: |
           python3 - <<'PY'
