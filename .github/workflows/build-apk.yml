@@ -13,7 +13,7 @@
 
       - name: Unzip project
         run: |
-          unzip -q ArjunSara_Android_All_Features_English_Final.zip -d project
+          unzip -q ArjunSara_Android_All_Features_English_Animated_Final.zip -d project
 
       - name: Setup Java
         uses: actions/setup-java@v5
