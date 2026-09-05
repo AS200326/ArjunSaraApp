@@ -1,97 +1,39 @@
- name: Build Mogudu Pellam APK
+name: Build Mogudu Pellam APK
 
- on:
+on:
   workflow_dispatch:
 
- jobs:
+jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Find ZIP
-        run: |
-          set -e
-          ZIP_FILE=$(find . -maxdepth 2 -type f -name "*.zip" | head -n 1)
-
-          if [ -z "$ZIP_FILE" ]; then
-            echo "ERROR: ZIP file not found"
-            exit 1
-          fi
-
-          echo "ZIP: $ZIP_FILE"
-          echo "ZIP_FILE=$ZIP_FILE" >> "$GITHUB_ENV"
-
-      - name: Extract ZIP
-        run: |
-          set -e
-          rm -rf project
-          mkdir -p project
-          unzip -q "$ZIP_FILE" -d project
-          echo "ZIP extracted successfully"
-
-      - name: Locate Android Project
-        run: |
-          set -e
-
-          PROJECT_DIR=$(find project -type f -name "build.gradle" -print -quit | xargs dirname)
-
-          if [ -z "$PROJECT_DIR" ]; then
-            echo "ERROR: Android project not found"
-            exit 1
-          fi
-
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Project: $PROJECT_DIR"
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v5
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
-      - name: Setup Gradle 8.7
-        uses: gradle/actions/setup-gradle@v5
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.7"
+          gradle-version: '8.7'
 
-      - name: Fix AndroidManifest XML
+      - name: Find Project
         run: |
-          set -e
-
-          MANIFEST="$PROJECT_DIR/app/src/main/AndroidManifest.xml"
-
-          if [ ! -f "$MANIFEST" ]; then
-            echo "ERROR: AndroidManifest.xml not found"
-            exit 1
-          fi
-
-          echo "Fixing manifest: $MANIFEST"
-
-          sed -i '1s/^\xEF\xBB\xBF//' "$MANIFEST"
-          sed -i 's/“/"/g; s/”/"/g; s/‘/'"'"'/g; s/’/'"'"'/g' "$MANIFEST"
-          sed -i 's/ / /g' "$MANIFEST"
-          sed -i 's/Arjun & Sara/Arjun \&amp; Sara/g' "$MANIFEST"
-
-          echo "Manifest cleaned"
-
-      - name: Check Manifest
-        run: |
-          set -e
-
-          python3 -c "import xml.etree.ElementTree as ET; ET.parse('$PROJECT_DIR/app/src/main/AndroidManifest.xml'); print('Manifest XML is valid')"
+          find . -name AndroidManifest.xml
+          find . -name build.gradle
 
       - name: Build APK
         run: |
-          set -e
-          cd "$PROJECT_DIR"
-          gradle --no-daemon clean assembleDebug --stacktrace
+          cd project/ArjunSaraApp
+          gradle --no-daemon :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mogudu-Pellam-19-Features-APK
-          path: project/**/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+          name: Mogudu-Pellam-APK
+          path: project/ArjunSaraApp/app/build/outputs/apk/debug/*.apk
