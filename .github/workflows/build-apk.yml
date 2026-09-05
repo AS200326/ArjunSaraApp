@@ -1,9 +1,9 @@
- name: Build Arjun Sara APK
+name: Build Mogudu Pellam APK
 
- on:
+on:
   workflow_dispatch:
 
- jobs:
+jobs:
   build:
     runs-on: ubuntu-latest
 
@@ -11,34 +11,131 @@
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Unzip project
+      - name: Find and extract project ZIP
+        shell: bash
         run: |
-          unzip -q ArjunSara_Android_All_Features_English_Animated_Final.zip -d project
+          set -e
 
-      - name: Setup Java
+          ZIP_FILE=$(find . -maxdepth 2 -type f -name "*.zip" | head -n 1)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ERROR: No ZIP file found."
+            exit 1
+          fi
+
+          echo "Using ZIP: $ZIP_FILE"
+
+          rm -rf project
+          mkdir -p project
+
+          unzip -q "$ZIP_FILE" -d project
+
+          echo "ZIP extracted successfully."
+          find project -maxdepth 3 -type f | head -100
+
+      - name: Locate Android project
+        shell: bash
+        run: |
+          set -e
+
+          PROJECT_DIR=$(find project -type f -name "build.gradle" -o -name "build.gradle.kts" | head -n 1 | xargs -r dirname)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "ERROR: Android Gradle project not found."
+            exit 1
+          fi
+
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Android project found at: $PROJECT_DIR"
+
+      - name: Setup Java 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: '8.7'
+
       - name: Clean Manifest Encoding
+        shell: bash
         run: |
-          python3 -c 'p="project/ArjunSaraApp/app/src/main/AndroidManifest.xml"; s=open(p,"rb").read(); s=s.replace(b"\xef\xbb\xbf",b"").replace(b"\xe2\x80\x9c",b"\"").replace(b"\xe2\x80\x9d",b"\"").replace(b"\xc2\xa0",b" ").replace(b"Arjun & Sara",b"Arjun &amp; Sara"); open(p,"wb").write(s); print("Manifest encoding cleaned successfully")'
+          MANIFEST="$PROJECT_DIR/app/src/main/AndroidManifest.xml"
+
+          if [ -f "$MANIFEST" ]; then
+            python3 - "$MANIFEST" <<'PY'
+          import sys
+
+          p = sys.argv[1]
+
+with open(p, "rb") as f:
+    s = f.read()
+
+ s = s.replace(b"\xef\xbb\xbf", b"")
+ s = s.replace(b"\xe2\x80\x9c", b'"')
+ s = s.replace(b"\xe2\x80\x9d", b'"')
+ s = s.replace(b"\xc2\xa0", b" ")
+
+with open(p, "wb") as f:
+    f.write(s)
+
+  print("Manifest encoding cleaned successfully")
+  PY
+          else
+            echo "Manifest not found, continuing..."
+          fi
 
       - name: Validate Manifest
+        shell: bash
         run: |
-          python3 - <<'PY'
-          import xml.etree.ElementTree as ET
-          ET.parse("project/ArjunSaraApp/app/src/main/AndroidManifest.xml")
-          print("Manifest XML is valid")
-          PY
+          MANIFEST="$PROJECT_DIR/app/src/main/AndroidManifest.xml"
 
-      - name: Build APK
-        working-directory: project/ArjunSaraApp
-        run: gradle assembleDebug
+          if [ -f "$MANIFEST" ]; then
+            python3 - "$MANIFEST" <<'PY'
+import sys
+import xml.etree.ElementTree as ET
 
-      - name: Upload APK
+p = sys.argv[1]
+ET.parse(p)
+
+print("Manifest XML is valid")
+PY
+          else
+            echo "Manifest not found."
+            exit 1
+          fi
+
+            - name: Build Debug APK
+        shell: bash
+        run: |
+          set -e
+
+          cd "$PROJECT_DIR"
+
+          gradle --no-daemon clean assembleDebug --stacktrace
+
+      - name: Find APK
+        shell: bash
+        run: |
+          set -e
+
+          APK=$(find "$PROJECT_DIR/app/build/outputs/apk" \
+            -type f \
+            -name "*.apk" | head -n 1)
+
+          if [ -z "$APK" ]; then
+            echo "ERROR: APK was not generated."
+            exit 1
+          fi
+
+           echo "APK generated: $APK"
+           echo "APK_PATH=$APK" >> "$GITHUB_ENV"
+
+        - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ArjunSara-debug-apk
-          path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk
+          name: Mogudu-Pellam-19-Features-APK
+          path: ${{ env.APK_PATH }}
+          if-no-files-found: error                
