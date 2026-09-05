@@ -29,11 +29,14 @@ jobs:
 
       - name: Build APK
         run: |
-          cd project/ArjunSaraApp
+          PROJECT_DIR=$(dirname "$(find . -name AndroidManifest.xml -print -quit)")
+          PROJECT_DIR=$(dirname "$(dirname "$(dirname "$PROJECT_DIR")")")
+          echo "Project directory: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
           gradle --no-daemon :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Mogudu-Pellam-APK
-          path: project/ArjunSaraApp/app/build/outputs/apk/debug/*.apk
+          path: "**/app/build/outputs/apk/debug/*.apk"
