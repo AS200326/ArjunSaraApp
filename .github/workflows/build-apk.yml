@@ -1,7 +1,7 @@
  name: Build Arjun Sara APK
 
  on:
-   workflow_dispatch:
+  workflow_dispatch:
 
  jobs:
   build:
@@ -13,26 +13,18 @@
 
       - name: Unzip project
         run: |
-          unzip -q ArjunSara_Android_Fixed_Options.zip -d project
+          unzip -q ArjunSara_Android_Final_Fixed_Logo_MoguduPellam.zip -d project
 
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      
-      - name: Check Manifest
-        run: |
-          cat -A project/ArjunSaraApp/app/src/main/AndroidManifest.xml
 
-      - name: Check Manifest Detail
-        run: |
-          head -n 2 project/ArjunSaraApp/app/src/main/AndroidManifest.xml | tail -n 1 | od -c
-
-      
       - name: Clean Manifest Encoding
         run: |
           python3 -c 'p="project/ArjunSaraApp/app/src/main/AndroidManifest.xml"; s=open(p,"rb").read(); s=s.replace(b"\xef\xbb\xbf",b"").replace(b"\xe2\x80\x9c",b"\"").replace(b"\xe2\x80\x9d",b"\"").replace(b"\xc2\xa0",b" ").replace(b"Arjun & Sara",b"Arjun &amp; Sara"); open(p,"wb").write(s); print("Manifest encoding cleaned successfully")'
+
       - name: Validate Manifest
         run: |
           python3 - <<'PY'
@@ -40,14 +32,13 @@
           ET.parse("project/ArjunSaraApp/app/src/main/AndroidManifest.xml")
           print("Manifest XML is valid")
           PY
+
       - name: Build APK
-        working-directory: project/ArjunSaraApp  
+        working-directory: project/ArjunSaraApp
         run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ArjunSara-debug-apk
-          path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk 
-
-          
+          path: project/ArjunSaraApp/app/build/outputs/apk/debug/app-debug.apk
