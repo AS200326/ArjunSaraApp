@@ -17,19 +17,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Gradle
+      - name: Setup Gradle 8.7
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
-      - name: Show Project Files
+      - name: Check Project
         run: |
-          echo "Repository files:"
-          find . -maxdepth 3 -type f | sort | head -200
+          echo "Current folder:"
+          pwd
+          echo "Files:"
+          ls -la
+          echo "Gradle files:"
+          find . -maxdepth 2 -type f \( -name "build.gradle" -o -name "settings.gradle" \) -print
 
       - name: Build APK
         run: |
-          gradle --no-daemon :app:assembleDebug
+          gradle --no-daemon :app:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
