@@ -34,7 +34,7 @@ jobs:
           ls -la "$PROJECT_DIR"
 
       - name: Build APK
-       run: |
+        run: |
           PROJECT_DIR=$(find extracted -name settings.gradle -print -quit | xargs dirname)
           cd "$PROJECT_DIR"
           gradle --no-daemon :app:assembleDebug --stacktrace
