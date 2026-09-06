@@ -1,7 +1,10 @@
-name: Build Mogudu Pellam APK
+name: Build Mogudu Pellam
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -24,12 +27,13 @@ jobs:
 
       - name: Extract Android Project
         run: |
-          unzip -o "MoguduPellam_19_Features_LoveStory_FINAL_FIXED_READY.zip" -d extracted
+          unzip -o "MoguduPellam_PREMIUM_UI_FINAL.zip" -d extracted
 
       - name: Find Gradle Project
         run: |
           PROJECT_DIR=$(find extracted -name settings.gradle -print -quit | xargs dirname)
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          test -n "$PROJECT_DIR"
+          test -f "$PROJECT_DIR/app/build.gradle"
           echo "Project found at: $PROJECT_DIR"
           ls -la "$PROJECT_DIR"
 
@@ -37,11 +41,11 @@ jobs:
         run: |
           PROJECT_DIR=$(find extracted -name settings.gradle -print -quit | xargs dirname)
           cd "$PROJECT_DIR"
-          gradle --no-daemon :app:assembleDebug --stacktrace
+          gradle --no-daemon :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Mogudu-Pellam-APK
           path: extracted/**/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+          if-no-files-found: error  
