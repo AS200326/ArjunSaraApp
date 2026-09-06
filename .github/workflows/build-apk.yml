@@ -25,27 +25,35 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      - name: Check ZIP file
+        run: |
+          echo "Files in repository:"
+          ls -la
+          test -f "MoguduPellam_PREMIUM_PIN_TO_PIN_FEATURES_FINAL.zip"
+
       - name: Extract Android Project
         run: |
-          unzip -o "MoguduPellam_PREMIUM_UI_FINAL.zip" -d extracted
+          rm -rf extracted
+          mkdir -p extracted
+          unzip -o "MoguduPellam_PREMIUM_PIN_TO_PIN_FEATURES_FINAL.zip" -d extracted
 
       - name: Find Gradle Project
         run: |
           PROJECT_DIR=$(find extracted -name settings.gradle -print -quit | xargs dirname)
           test -n "$PROJECT_DIR"
           test -f "$PROJECT_DIR/app/build.gradle"
-          echo "Project found at: $PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Android project found at: $PROJECT_DIR"
           ls -la "$PROJECT_DIR"
 
       - name: Build APK
         run: |
-          PROJECT_DIR=$(find extracted -name settings.gradle -print -quit | xargs dirname)
           cd "$PROJECT_DIR"
-          gradle --no-daemon :app:assembleDebug
+          gradle --no-daemon :app:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mogudu-Pellam-APK
+          name: Mogudu-Pellam-Premium-APK
           path: extracted/**/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error  
+          if-no-files-found: error
