@@ -24,7 +24,7 @@ jobs:
 
       - name: Extract Android Project
         run: |
-          unzip -o "MoguduPellam_19_Features_LoveStory_FINAL_FIXED.zip" -d extracted
+          unzip -o "MoguduPellam_19_Features_LoveStory_FINAL_FIXED_READY.zip" -d extracted
 
       - name: Find Gradle Project
         run: |
