@@ -25,35 +25,68 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Check ZIP file
+      - name: Check V3 ZIP
         run: |
           echo "Files in repository:"
           ls -la
-          test -f "MoguduPellam_PREMIUM_PIN_TO_PIN_FEATURES_FINAL.zip"
+          test -f "MoguduPellam_REFERENCE_TOTAL_FORMAT_FINAL_V3.zip"
 
       - name: Extract Android Project
         run: |
           rm -rf extracted
           mkdir -p extracted
-          unzip -o "MoguduPellam_PREMIUM_PIN_TO_PIN_FEATURES_FINAL.zip" -d extracted
+          unzip -o "MoguduPellam_REFERENCE_TOTAL_FORMAT_FINAL_V3.zip" -d extracted
 
       - name: Find Gradle Project
         run: |
           PROJECT_DIR=$(find extracted -name settings.gradle -print -quit | xargs dirname)
-          test -n "$PROJECT_DIR"
-          test -f "$PROJECT_DIR/app/build.gradle"
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "ERROR: settings.gradle not found"
+            find extracted -maxdepth 4 -type f | sort
+            exit 1
+          fi
+
+          if [ ! -f "$PROJECT_DIR/app/build.gradle" ]; then
+            echo "ERROR: app/build.gradle not found"
+            ls -la "$PROJECT_DIR"
+            exit 1
+          fi
+
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Android project found at: $PROJECT_DIR"
+
+          echo "Android project found at:"
+          echo "$PROJECT_DIR"
+
           ls -la "$PROJECT_DIR"
 
-      - name: Build APK
+      - name: Check AndroidX Configuration
+        run: |
+          echo "Checking gradle.properties..."
+          if [ -f "$PROJECT_DIR/gradle.properties" ]; then
+            cat "$PROJECT_DIR/gradle.properties"
+          else
+            echo "gradle.properties not found, creating it..."
+            cat > "$PROJECT_DIR/gradle.properties" <<'EOF'
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
+          fi
+
+      - name: Build Debug APK
         run: |
           cd "$PROJECT_DIR"
           gradle --no-daemon :app:assembleDebug --stacktrace
 
+      - name: Check APK
+        run: |
+          echo "Searching for generated APK..."
+          find "$PROJECT_DIR/app/build/outputs" -type f -name "*.apk" -print
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mogudu-Pellam-Premium-APK
+          name: Mogudu-Pellam-V3-APK
           path: extracted/**/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
