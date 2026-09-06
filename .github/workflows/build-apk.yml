@@ -22,22 +22,25 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Check Project
+      - name: Extract Android Project
         run: |
-          echo "Current folder:"
-          pwd
-          echo "Files:"
-          ls -la
-          echo "Gradle files:"
-          find . -maxdepth 2 -type f \( -name "build.gradle" -o -name "settings.gradle" \) -print
+          unzip -o "MoguduPellam_19_Features_LoveStory_FINAL_FIXED.zip" -d extracted
+
+      - name: Find Gradle Project
+        run: |
+          PROJECT_DIR=$(find extracted -name settings.gradle -print -quit | xargs dirname)
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "Project found at: $PROJECT_DIR"
+          ls -la "$PROJECT_DIR"
 
       - name: Build APK
         run: |
+          cd "$PROJECT_DIR"
           gradle --no-daemon :app:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Mogudu-Pellam-APK
-          path: app/build/outputs/apk/debug/*.apk
+         path: "${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk"
           if-no-files-found: error
