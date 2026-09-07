@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Button;
 
 public class MainActivity extends Activity {
 
@@ -20,13 +21,13 @@ public class MainActivity extends Activity {
         layout.setBackgroundColor(Color.rgb(25, 18, 45));
 
         TextView title = new TextView(this);
-        title.setText("Mogudu Pellam ❤️");
+        title.setText("Mogudu Pellam");
         title.setTextColor(Color.WHITE);
         title.setTextSize(30);
         title.setGravity(Gravity.CENTER);
 
         TextView message = new TextView(this);
-        message.setText("\nHappy Birthday Chinna Papa ❣️\n\n💕 Welcome to our Couple App 💕");
+        message.setText("Happy Birthday Chinna Papa");
         message.setTextColor(Color.WHITE);
         message.setTextSize(20);
         message.setGravity(Gravity.CENTER);
@@ -34,6 +35,29 @@ public class MainActivity extends Activity {
         layout.addView(title);
         layout.addView(message);
 
+        addButton(layout, "Daily Love Message");
+        addButton(layout, "Couple Questions");
+        addButton(layout, "Spin the Wheel");
+        addButton(layout, "Truth or Dare");
+        addButton(layout, "Couple Challenge");
+        addButton(layout, "Funny Punishment");
+        addButton(layout, "Love Meter");
+        addButton(layout, "XP Levels Achievements");
+        addButton(layout, "Coins and Rewards");
+        addButton(layout, "Memories");
+        addButton(layout, "Our Love Story");
+
         setContentView(layout);
     }
+
+    private void addButton(LinearLayout layout, String text) {
+
+        Button button = new Button(this);
+
+        button.setText(text);
+        button.setTextSize(16);
+        button.setAllCaps(false);
+
+        layout.addView(button);
+     }
 }
